@@ -151,7 +151,6 @@ justify-content: center;
     border-radius: 5px;
 }
 .fa-regular.fa-circle{
-    /* margin: 5px 5px 5px 92%; */
     position: relative;
     top: 5px;
     left: 90%;
@@ -206,3 +205,32 @@ justify-content: center;
     font-size: 14px;
     padding-left: 17px;
 }
+
+@media only screen and (max-width: 600px) {
+    .container{
+        flex-direction: column;
+    }
+    #open{
+        width: 250px;
+        height: 400px;
+        margin: center;
+        
+    }
+    #in-progress{
+        width: 250px;
+        height: 400px;
+        margin: center;
+        
+    }
+    #in-review{
+        width: 250px;
+        height: 400px;
+        margin: center;        
+    }
+    #done{
+        width: 250px;
+        height: 400px;
+        margin: center;        
+    }
+    
+  }
