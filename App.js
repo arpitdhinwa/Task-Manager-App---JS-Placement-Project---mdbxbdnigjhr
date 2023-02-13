@@ -1,91 +1,124 @@
-const state_checker ={
-    "open" : ["none"],
-    "in-progress" : ["open"],
-    "in-review" : ["in-progress"],
-    "done" : ["in-review"]
-}
-const icon_checker ={
-    "fa-regular fa-circle" : "fa-solid fa-hourglass",
-    "fa-solid fa-hourglass" : "fa-solid fa-pen-to-square",
-    "fa-solid fa-pen-to-square" : "fa-solid fa-check",
-    "fa-solid fa-check" : "fa-solid fa-check"
-}
-const btn = document.getElementById("add_btn");
-const input = document.getElementById("input");
-let ids = 1;
+let taskHeading = document.querySelector(".task-heading");
+let input = document.querySelector(".add-input");
+let button = document.querySelector(".add-btn");
+const containerList = document.querySelector(".container-list");
+const modle_container = document.querySelector('.modle-container');
 
-btn.addEventListener('click',()=>{
+input.setAttribute("placeholder", "Please Enter Task");
 
-    if(!input.value==''){
 
-        const cb1 =  document.getElementById("card-bord1");
-        const button = document.createElement('button');
-        let new_div = document.createElement('div');
-        new_div.appendChild(button);
-        button.setAttribute('id','open_btn');
-        new_div.setAttribute('draggable','true');
-        new_div.setAttribute('ondragstart','drag(event)');
-        new_div.setAttribute('class','dragg');
-        new_div.setAttribute('id',`div-id${ids}`);
-        ids++;
-        new_div.innerHTML += `<details>
-        <summary>${input.value}</summary>
-        <p id="content" contenteditable="True">please enter description about the task</p>
-        </details>`;
-        new_div.innerHTML += '<i class="fa-regular fa-circle"></i><br>&nbsp';
-        cb1.appendChild(new_div);
-        input.value ='';
-        window.addEventListener('keydown',(e)=>{
-            if(e.keyCode==13 || e.keyIdentifier=='Enter'){
-                if(e.target.id=='content'){
-                    e.preventDefault()
-                }
-            }
-        })
+function addTask() {
+    if(input.value === "") {
+        alert("please enter task");
     }
-    else{
-        alert("Please enter valid task !");
-    } 
-    let p_val = document.querySelectorAll('p');
-    p_val.forEach(val => {
-        val.addEventListener('mouseover',()=>{
-            if(val.innerHTML ==''){
-                val.innerHTML = "please enter description about the task";
-            }
-        })
-    }); 
-})
+    else {
+    let inputValue = input.value;
 
-function drag(e){
-    e.dataTransfer.setData('text/plain',e.target.id);
-}
-function dragover(e,ele){
-    if(e.target==ele && e.target!=''){
-    //     console.log(typeof ele);
-    //     console.log(typeof e.target);
-        e.preventDefault();
-    }
-}
+    const openList = document.createElement('div');
+    openList.classList = "container-list1-item";
+    const nameOfTask = document.createElement('h4');
+    nameOfTask.innerText = inputValue;
+    const descriptionOfTask = document.createElement('p');
+    descriptionOfTask.classList = "description";
+   
 
-function drop(e) {
-    e.preventDefault();
-    const soruceId = e.dataTransfer.getData('text/plain');
-    const task_id = document.getElementById(soruceId).parentNode.parentNode.id;
-    const state_id = document.getElementById(e.target.id).parentNode.id;
+    const deleteTask = document.createElement('button');
+    deleteTask.classList = "delete";
+    deleteTask.innerText = "";
+    const itemColor = document.createElement('div');
+    itemColor.classList.add('item-color');
+    openList.appendChild(itemColor);
+   
 
-    if(state_checker[state_id].includes(task_id)){
-        icon_changer(soruceId);
-        e.target.appendChild(document.getElementById(soruceId));
-    }
-    else{
-        alert(`You can't add from "${task_id}" section to "${state_id}" section`);
-    }
-}
 
-function icon_changer(id){
-    const icons = document.querySelectorAll(`#${id} i`);
-    icons.forEach(ele=>{
-        ele.className = icon_checker[ele.className];
+
+    openList.append(nameOfTask, descriptionOfTask, deleteTask)
+    containerList.appendChild(openList);
+
+    deleteTask.addEventListener('click', (e) => {
+        e.stopPropagation()
+        openList.remove();
     })
-    
+    editModel(openList, nameOfTask, descriptionOfTask);
+    input.value = null;
+
+    openList.setAttribute("draggable", "true");
+    openList.addEventListener('dragstart', () => {
+        openList.classList.add('dragging');
+    });
+    openList.addEventListener('dragend', () => {
+        openList.classList.remove('dragging');
+    });
+
+    const listcontainer = document.querySelectorAll('.container-list');
+    listcontainer.forEach((list) => {
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingElm = document.querySelector('.dragging');
+            list.appendChild(draggingElm);
+        })
+    })
+
 }
+}
+
+function editModel(div, ip, des) {
+    div.addEventListener('dblclick', (e) => {
+        e.stopPropagation()
+        const storeDiv = document.createElement('div');
+        storeDiv.classList = "modle-container-style"
+        const taskLable = document.createElement('lable');
+        taskLable.innerText = "Task Name";
+        const descriptionLable = document.createElement('lable');
+        descriptionLable.innerText = "Description";
+
+        const inputTask = document.createElement('input');
+        inputTask.classList = "editInput";
+        inputTask.setAttribute('id', 'edit1');
+        inputTask.setAttribute('type', 'text');
+        inputTask.value = ip.innerText;
+
+        const textArea = document.createElement('textarea');
+        textArea.classList = "editInput"
+        textArea.setAttribute('cols', '5');
+        textArea.setAttribute('rows', '5');
+        textArea.value = des.innerText;
+
+     
+
+        const divButton = document.createElement('div');
+        divButton.classList = "buttonDiv";
+
+        const saveBtn = document.createElement('button');
+        saveBtn.innerText = 'save';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerText = 'close';
+
+        divButton.appendChild(saveBtn);
+        divButton.appendChild(deleteBtn);
+        storeDiv.append(taskLable, inputTask, descriptionLable, textArea, divButton)
+        modle_container.appendChild(storeDiv)
+
+        saveTheEditedValue(saveBtn, ip, des, storeDiv, inputTask, textArea, "save");
+        saveTheEditedValue(deleteBtn, ip, des, storeDiv, inputTask, textArea, "close")
+        console.log(div.childNodes);
+    })
+}
+
+function saveTheEditedValue(btnFun, child, des, mainDiv, input1, input2, condition) {
+    btnFun.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (condition === "save") {
+            child = input1.value;
+            des.innerText = input2.value;
+            mainDiv.remove();
+        } else {
+            mainDiv.remove();
+        }
+
+    })
+}
+    
+
+button.addEventListener('click', addTask)
